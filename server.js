@@ -51,6 +51,7 @@ app.get("/scrape", function(req, res) {
       result.title = $(this)
         .children("a")
         .text();
+
       //   result.link = $(this)
       //     .children("a")
       //     .attr("href");
@@ -75,12 +76,12 @@ app.get("/scrape", function(req, res) {
 });
 
 // Route for getting all Articles from the db
-app.get("/movies", function(req, res) {
+app.get("/books", function(req, res) {
   // Grab every document in the Articles collection
-  db.Movie.find({})
-    .then(function(dbMovie) {
+  db.Book.find({})
+    .then(function(dbBook) {
       // If we were able to successfully find Articles, send them back to the client
-      res.json(dbMovie);
+      res.json(dbBook);
     })
     .catch(function(err) {
       // If an error occurred, send it to the client
@@ -89,14 +90,14 @@ app.get("/movies", function(req, res) {
 });
 
 // Route for grabbing a specific Article by id, populate it with it's note
-app.get("/movies/:id", function(req, res) {
+app.get("/books/:id", function(req, res) {
   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
-  db.Movie.findOne({ _id: req.params.id })
+  db.Book.findOne({ _id: req.params.id })
     // ..and populate all of the notes associated with it
     // .populate("note")
-    .then(function(dbMovie) {
+    .then(function(dbBook) {
       // If we were able to successfully find an Article with the given id, send it back to the client
-      res.json(dbMovie);
+      res.json(dbBook);
     })
     .catch(function(err) {
       // If an error occurred, send it to the client
