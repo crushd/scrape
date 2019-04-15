@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/openingmovies", {
+mongoose.connect("mongodb://localhost/booksbooksbooks", {
   useNewUrlParser: true
 });
 
@@ -36,44 +36,42 @@ mongoose.connect("mongodb://localhost/openingmovies", {
 // A GET route for scraping the echoJS website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with axios
-  axios
-    .get("https://www.rottentomatoes.com/browse/opening/")
-    .then(function(response) {
-      // Then, we load that into cheerio and save it to $ for a shorthand selector
-      var $ = cheerio.load(response.data);
+  axios.get("http://books.toscrape.com").then(function(response) {
+    // Then, we load that into cheerio and save it to $ for a shorthand selector
+    var $ = cheerio.load(response.data);
 
-      //console.log(response.data);
+    // Now, we grab every h3 within a div class .as-producttile-info tag, and do the following:
+    $("li article.product_pod h3").each(function(i, element) {
+      // Save an empty result object
+      var result = {};
 
-      // Now, we grab every h3 within a div class .as-producttile-info tag, and do the following:
-      $(".mb-movie h3").each(function(i, element) {
-        // Save an empty result object
-        var result = {};
+      //console.log(this);
 
-        console.log(element);
+      // Add the text and href of every link, and save them as properties of the result object
+      result.title = $(this)
+        .children("a")
+        .text();
+      //   result.link = $(this)
+      //     .children("a")
+      //     .attr("href");
 
-        // Add the text and href of every link, and save them as properties of the result object
-        result.title = $(this).text();
-        result.link = $(this)
-          .children("a")
-          .attr("href");
+      console.log(result.title);
 
-        console.log(result);
-
-        // Create a new Article using the `result` object built from scraping
-        db.Movie.create(result)
-          .then(function(dbMovie) {
-            // View the added result in the console
-            console.log(dbMovie);
-          })
-          .catch(function(err) {
-            // If an error occurred, log it
-            console.log(err);
-          });
-      });
-
-      // Send a message to the client
-      res.send("Scrape Complete");
+      //   // Create a new Article using the `result` object built from scraping
+      //   db.Movie.create(result)
+      //     .then(function(dbMovie) {
+      //       // View the added result in the console
+      //       console.log(dbMovie);
+      //     })
+      //     .catch(function(err) {
+      //       // If an error occurred, log it
+      //       console.log(err);
+      //     });
     });
+
+    // Send a message to the client
+    res.send("Scrape Complete");
+  });
 });
 
 // Route for getting all Articles from the db

@@ -1,9 +1,9 @@
 // Grab the articles as a json
-$.getJSON("/movies", function(data) {
+$.getJSON("/books", function(data) {
   // For each one
   for (var i = 0; i < data.length; i++) {
     // Display the apropos information on the page
-    $("#movies").append(
+    $("#books").append(
       "<p data-id='" +
         data[i]._id +
         "'>" +
