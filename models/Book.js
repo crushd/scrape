@@ -12,7 +12,15 @@ var BookSchema = new Schema({
     required: true
   },
   // `link` is required and of type String
-  link: {
+  bookUrl: {
+    type:String,
+    required:true
+  },
+  bookImg: {
+    type: String,
+    required: true
+  },
+  bookPrice: {
     type: String,
     required: true
   }

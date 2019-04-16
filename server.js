@@ -1,3 +1,5 @@
+const scrapeUri = "http://books.toscrape.com";
+
 var express = require("express");
 var logger = require("morgan");
 var mongoose = require("mongoose");
@@ -36,12 +38,12 @@ mongoose.connect("mongodb://localhost/booksbooksbooks", {
 // A GET route for scraping the echoJS website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with axios
-  axios.get("http://books.toscrape.com").then(function(response) {
+  axios.get(scrapeUri).then(function(response) {
     // Then, we load that into cheerio and save it to $ for a shorthand selector
     var $ = cheerio.load(response.data);
 
     // Now, we grab every h3 within a div class .as-producttile-info tag, and do the following:
-    $("li article.product_pod h3").each(function(i, element) {
+    $("article").each(function(i, element) {
       // Save an empty result object
       var result = {};
 
@@ -49,25 +51,40 @@ app.get("/scrape", function(req, res) {
 
       // Add the text and href of every link, and save them as properties of the result object
       result.title = $(this)
+        .children("h3")
         .children("a")
         .text();
+
+      result.bookUrl = $(this)
+        .children("h3")
+        .children("a")
+        .attr("href");
+
+      result.bookImg = $(this)
+        .find("img")
+        .attr("src");
+      
+      result.bookPrice = $(this)
+        .find("p.price_color")
+        .text()
+
 
       //   result.link = $(this)
       //     .children("a")
       //     .attr("href");
 
-      console.log(result.title);
+      console.log(result);
 
-      //   // Create a new Article using the `result` object built from scraping
-      //   db.Movie.create(result)
-      //     .then(function(dbMovie) {
-      //       // View the added result in the console
-      //       console.log(dbMovie);
-      //     })
-      //     .catch(function(err) {
-      //       // If an error occurred, log it
-      //       console.log(err);
-      //     });
+        // Create a new Article using the `result` object built from scraping
+        db.Book.create(result)
+          .then(function(dbBook) {
+            // View the added result in the console
+            console.log(dbBook);
+          })
+          .catch(function(err) {
+            // If an error occurred, log it
+            console.log(err);
+          });
     });
 
     // Send a message to the client
